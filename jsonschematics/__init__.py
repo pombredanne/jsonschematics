@@ -67,6 +67,7 @@ def jsonschema_for_model(model, _type='object'):
     schema = {
         'type': 'object',
         'title': model.__name__,
+        'description': model.__doc__,
         'properties': properties,
     }
 
