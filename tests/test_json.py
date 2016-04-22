@@ -15,6 +15,7 @@ class BankAccount(Model):
 
 class BirthPlace(Model):
     name = StringType(required=True, min_length=1, max_length=30)
+    planet = StringType(default='Earth')
 
 
 class Person(Model):
@@ -23,6 +24,7 @@ class Person(Model):
     age = IntType()
     birth_place = ModelType(BirthPlace)
     bank_accounts = ListType(ModelType(BankAccount))
+    guitar_preference = StringType(choices=['stratocaster', 'telecaster', 'gretsch'])
 
 
 test_data = {
@@ -38,10 +40,11 @@ test_data = {
     }, {
         'account_id': long(456),
         'amount': 100.54,
-    }]
+    }],
+    'guitar_preference': 'telecaster'
 }
 
-converted_schema_string = '{"properties": {"age": {"type": "integer"}, "bank_accounts": {"items": {"properties": {"account_id": {"minimum": 0, "type": "integer"}, "amount": {"type": "number"}}, "required": ["account_id"], "title": "BankAccount", "type": "object"}, "title": "BankAccount Set", "type": "array"}, "birth_place": {"properties": {"name": {"maxLength": 30, "minLength": 1, "type": "string"}}, "required": ["name"], "title": "BirthPlace", "type": "object"}, "name": {"type": "string"}, "website": {"type": "string"}}, "required": ["name"], "title": "Person", "type": "object"}'
+converted_schema_string = '{"properties": {"age": {"type": "integer"}, "bank_accounts": {"items": {"properties": {"account_id": {"minimum": 0, "type": "integer"}, "amount": {"type": "number"}}, "required": ["account_id"], "title": "BankAccount", "type": "object"}, "title": "BankAccount Set", "type": "array"}, "birth_place": {"properties": {"name": {"maxLength": 30, "minLength": 1, "type": "string"}, "planet": {"default": "Earth", "type": "string"}}, "required": ["name"], "title": "BirthPlace", "type": "object"}, "guitar_preference": {"enum": ["stratocaster", "telecaster", "gretsch"], "type": "string"}, "name": {"type": "string"}, "website": {"type": "string"}}, "required": ["name"], "title": "Person", "type": "object"}'
 
 class TestModelFunctions(unittest.TestCase):
 

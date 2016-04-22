@@ -27,6 +27,8 @@ schema_kwargs_to_schematics = {
     'pattern': 'regex',
     'minimum': 'min_value',
     'maximum': 'max_value',
+    'enum': 'choices',
+    'default': 'default'
 }
 
 
