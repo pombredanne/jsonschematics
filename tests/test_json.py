@@ -41,13 +41,12 @@ test_data = {
     }]
 }
 
-converted_schema_string = '{"required": ["name"], "type": "object", "properties": {"website": {"type": "string"}, "bank_accounts": {"items": {"required": ["account_id"], "type": "object", "properties": {"amount": {"type": "number"}, "account_id": {"minimum": 0, "type": "integer"}}, "title": "BankAccount"}, "type": "array", "title": "BankAccount Set"}, "age": {"type": "integer"}, "birth_place": {"required": ["name"], "type": "object", "properties": {"name": {"minLength": 1, "type": "string", "maxLength": 30}}, "title": "BirthPlace"}, "name": {"type": "string"}}, "title": "Person"}'
-
+converted_schema_string = '{"properties": {"age": {"type": "integer"}, "bank_accounts": {"items": {"properties": {"account_id": {"minimum": 0, "type": "integer"}, "amount": {"type": "number"}}, "required": ["account_id"], "title": "BankAccount", "type": "object"}, "title": "BankAccount Set", "type": "array"}, "birth_place": {"properties": {"name": {"maxLength": 30, "minLength": 1, "type": "string"}}, "required": ["name"], "title": "BirthPlace", "type": "object"}, "name": {"type": "string"}, "website": {"type": "string"}}, "required": ["name"], "title": "Person", "type": "object"}'
 
 class TestModelFunctions(unittest.TestCase):
 
     def test_schema_serialization(self):
-        val = to_jsonschema(Person)
+        val = to_jsonschema(Person, sort_keys=True)
         self.assertEquals(val, converted_schema_string)
 
     def test_validation_schema_validation(self):

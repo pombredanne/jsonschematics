@@ -81,6 +81,6 @@ def jsonschema_for_model(model, _type='object'):
     return schema
 
 
-def to_jsonschema(model):
+def to_jsonschema(model, **kwargs):
     """Returns a representation of this schema class as a JSON schema."""
-    return json.dumps(jsonschema_for_model(model))
+    return json.dumps(jsonschema_for_model(model), **kwargs)
