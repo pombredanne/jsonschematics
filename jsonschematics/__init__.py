@@ -92,9 +92,16 @@ def jsonschema_for_model(model, _type='object'):
 
     properties, required = jsonschema_for_fields(model)
 
+    if hasattr(model, 'metadata'):
+        schema_title = model.metadata.get('label', '')
+        schema_description = model.metadata.get('description', '')
+    else:
+        schema_title = ''
+        schema_description = ''
+
     schema = OrderedDict([
-        ('title', model.metadata.get("label", "")),
-        ('description', model.metadata.get("description", "")),
+        ('title', schema_title),
+        ('description', schema_description),
         ('type', 'object'),
     ])
 
