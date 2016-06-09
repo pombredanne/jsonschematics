@@ -18,6 +18,7 @@ SCHEMATIC_TYPE_TO_JSON_TYPE = {
     'FloatType': 'number',
     'DecimalType': 'number',
     'BooleanType': 'boolean',
+    'BaseType': 'object'
 }
 
 # Schema Serialization
