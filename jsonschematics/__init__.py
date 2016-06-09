@@ -6,6 +6,8 @@ from schematics.types.base import (BaseType, NumberType, IntType, LongType, Floa
                                    DecimalType, BooleanType)
 from schematics.types.compound import ModelType, ListType
 
+from collections import OrderedDict
+
 __version__ = '1.0'
 
 
@@ -32,7 +34,7 @@ schema_kwargs_to_schematics = {
 
 
 def jsonschema_for_single_field(field_instance):
-    field_schema = {}
+    field_schema = OrderedDict()
 
     if hasattr(field_instance, 'metadata'):
         field_schema["title"] = field_instance.metadata.get('label', '')
@@ -62,10 +64,10 @@ def jsonschema_for_fields(model):
                 node = jsonschema_for_model(field_instance.model_class, 'array')
             except AttributeError:
                 field_schema = jsonschema_for_single_field(field_instance.field)
-                node = {
-                    'type': 'array',
-                    'items': field_schema
-                }
+                node = OrderedDict([
+                    ('type', 'array'),
+                    ('items', field_schema)
+                ])
 
         # Convert field as single model
         elif isinstance(field_instance, BaseType):
@@ -89,31 +91,36 @@ def jsonschema_for_model(model, _type='object'):
 
     properties, required = jsonschema_for_fields(model)
 
-    schema = {
-        'type': 'object',
-        'title': model.metadata.get("label", ""),
-        'description': model.metadata.get("description", ""),
-        'properties': properties,
-    }
+    schema = OrderedDict([
+        ('title', model.metadata.get("label", "")),
+        ('description', model.metadata.get("description", "")),
+        ('type', 'object'),
+    ])
 
     if required:
         schema['required'] = required
 
+    if hasattr(model, '_schema_order'):
+        ordered_properties = [(i, properties.pop(i)) for i in model._schema_order]
+        schema['properties'] = OrderedDict(ordered_properties)
+    else:
+        schema['properties'] = properties
+
     if _type == 'array':
-        schema = {
-            'type': 'array',
-            #'title': '%s Set' % (model.__name__),
-            'items': schema,
-        }
+        schema = OrderedDict([
+            ('type', 'array'),
+            ('items', schema),
+        ])
 
     return schema
 
 
 def to_jsonschema(model, **kwargs):
     """Returns a representation of this schema class as a JSON schema."""
-    jsonschema = jsonschema_for_model(model)
-    jsonschema['$schema'] = 'http://json-schema.org/draft-04/schema#'
-    schema_id = kwargs.pop('schema_id', None)
-    if schema_id is not None:
-        jsonschema['id'] = schema_id
-    return json.dumps(jsonschema, **kwargs)
+    schema_id = kwargs.pop('schema_id', '')
+    jsonschema = OrderedDict([
+        ('$schema', 'http://json-schema.org/draft-04/schema#'),
+        ('id', schema_id)
+    ])
+    jsonschema.update(jsonschema_for_model(model))
+    return jsonschema
