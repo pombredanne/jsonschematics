@@ -34,10 +34,11 @@ schema_kwargs_to_schematics = {
 def jsonschema_for_single_field(field_instance):
     field_schema = {}
 
-    field_schema["type"] = SCHEMATIC_TYPE_TO_JSON_TYPE.get(field_instance.__class__.__name__, 'string')
+    if hasattr(field_instance, 'metadata'):
+        field_schema["title"] = field_instance.metadata.get('label', '')
+        field_schema["description"] = field_instance.metadata.get('description', '')
 
-    field_schema["title"] = field_instance.metadata.get('label', '')
-    field_schema["description"] = field_instance.metadata.get('description', '')
+    field_schema["type"] = SCHEMATIC_TYPE_TO_JSON_TYPE.get(field_instance.__class__.__name__, 'string')
 
     for js_key, schematic_key in iteritems(schema_kwargs_to_schematics):
         value = getattr(field_instance, schematic_key, None)
@@ -75,7 +76,7 @@ def jsonschema_for_fields(model):
             properties[serialized_name] = node
         else:
             properties[serialized_name] = {
-                "oneOf":  [
+                "oneOf": [
                     {'type': 'null'},
                     node
                 ]
